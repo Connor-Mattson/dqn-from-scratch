@@ -1,0 +1,20 @@
+.venv/
+outputs/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# Private coursework notes
+.teacher/
+EXERCISE.md
+
+# Generated results are ignored, except the assets the README embeds
+results/*
+!results/.gitkeep
+!results/cartpole_win.gif
+!results/lunar_win_soft.gif
+!results/results.png
+!results/casino/
+results/casino/*
+!results/casino/casino_duel.gif
+!results/casino/sweep.csv
