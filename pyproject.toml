@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dqn"
+version = "0.1.0"
+description = "Deep Q-Networks from scratch in PyTorch: soft target updates, Double DQN, and multi-seed experiments on CartPole, LunarLander and a custom maximization-bias environment."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.2",
+    "gymnasium>=1.0",
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+# Only needed for `python -m dqn.evaluate --render` (pulls in pygame).
+render = ["gymnasium[classic-control]>=1.0"]
+# LunarLander-v3 and the other Box2D envs. Needs swig at build time (pip install swig first).
+box2d = ["gymnasium[box2d]>=1.0"]
+# Rendering the maximization-bias casino (env.render() and the duel GIF).
+casino = ["pygame-ce>=2.5"]
+
+[project.scripts]
+dqn-train = "dqn.train:main"
+dqn-evaluate = "dqn.evaluate:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+markers = [
+    "scaffold: checks for provided plumbing; these should pass before any learner work",
+    "learner: checks for TODO(learner) tasks; these fail until the matching task is implemented",
+]
