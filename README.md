@@ -13,23 +13,12 @@ tests. One of the three is a custom environment where the true Q-values are know
 
 ## TL;DR
 
-- **The core algorithm is written from first principles** in PyTorch: replay buffer,
-  epsilon-greedy acting, Bellman targets with terminal masking, Huber loss with
-  gradient clipping, and a lagged target network. No RL library is used.
-- **Two extensions on top:** soft (Polyak) target updates
-  (`θ⁻ ← τθ + (1−τ)θ⁻`, written in place under `no_grad`) and **Double DQN**, which
-  splits action selection (online net) from action evaluation (target net).
-- **Solves CartPole and LunarLander.** The best CartPole policy scores **500.0 ± 0.0**
-  (a perfect score) over 50 greedy episodes. The best LunarLander policy scores
-  **215.8** against a random baseline of −155.
-- **Soft targets finished ahead on both environments** and had lower variance across seeds.
-  On LunarLander, all 5 soft-target seeds cleared a 195 trailing mean, against 3 of 5 with hard targets.
-- **Double DQN removes about two thirds of the overestimation bias** on
-  `MaxBiasCasino-v0`, a custom Gymnasium environment built so the bias can be measured
-  against the exact true Q-values.
-- **Experiments are run like experiments:** 5–10 seeds per arm, curves resampled
-  onto a shared environment-step grid, ±1 s.e. ribbons, Welch's t-tests, and 139 tests
-  in `pytest`.
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -e '.[render]'
+python -m dqn.train --total-steps 100000 --target-update-mode soft --tau 0.005   # ~1 min on CPU
+python -m dqn.evaluate --episodes 20    # greedy vs random score, GIF at results/median_episode.gif
+```
 
 ## Setup
 
@@ -97,6 +86,26 @@ import gymnasium as gym
 import dqn.casino_env                                         # registers MaxBiasCasino-v0
 env = gym.make("MaxBiasCasino-v0", n_actions=20, sigma=2.0, render_mode="rgb_array")
 ```
+
+## Summary of Implementation
+
+- **The core algorithm is written from first principles** in PyTorch: replay buffer,
+  epsilon-greedy acting, Bellman targets with terminal masking, Huber loss with
+  gradient clipping, and a lagged target network. No RL library is used.
+- **Two extensions on top:** soft (Polyak) target updates
+  (`θ⁻ ← τθ + (1−τ)θ⁻`, written in place under `no_grad`) and **Double DQN**, which
+  splits action selection (online net) from action evaluation (target net).
+- **Solves CartPole and LunarLander.** The best CartPole policy scores **500.0 ± 0.0**
+  (a perfect score) over 50 greedy episodes. The best LunarLander policy scores
+  **215.8** against a random baseline of −155.
+- **Soft targets finished ahead on both environments** and had lower variance across seeds.
+  On LunarLander, all 5 soft-target seeds cleared a 195 trailing mean, against 3 of 5 with hard targets.
+- **Double DQN removes about two thirds of the overestimation bias** on
+  `MaxBiasCasino-v0`, a custom Gymnasium environment built so the bias can be measured
+  against the exact true Q-values.
+- **Experiments are run like experiments:** 5–10 seeds per arm, curves resampled
+  onto a shared environment-step grid, ±1 s.e. ribbons, Welch's t-tests, and 139 tests
+  in `pytest`.
 
 ## Results
 
